@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Interactive RNA-seq analysis agent for local orchestration and remote server execution."
 requires-python = ">=3.11"
 dependencies = []
+authors = [
+  { name = "Qi Zhao", email = "zhaoqi@sysucc.org.cn" }
+]
 
 [project.scripts]
 rnaseq-agent = "rnaseq_agent.cli:main"

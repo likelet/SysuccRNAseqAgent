@@ -2,6 +2,8 @@
 
 This project starts an interactive RNA-seq analysis agent from scratch. The current version can validate local FASTQ files, upload them to a remote server, generate remote pipeline scripts for `fastp`, `STAR`, `Arriba`, `featureCounts`, and `RSEM`, submit the job through `slurm`, `pbs`, or a remote background shell, poll job state, download result bundles, and send email notifications.
 
+Author: Qi Zhao <zhaoqi@sysucc.org.cn>
+
 ## Current Capabilities
 
 - Interactive wizard with step-by-step progress.
@@ -14,6 +16,42 @@ This project starts an interactive RNA-seq analysis agent from scratch. The curr
 - `status` command for refreshing current remote state.
 - Email notification settings stored in the project config.
 - JSON configuration only for now, so the tool runs with the Python standard library.
+
+## Analysis Workflow
+
+```mermaid
+flowchart LR
+    A["Local FASTQ"] --> B["Upload to server raw/"]
+    B --> C["fastp 0.24.1<br/>QC and trimming"]
+    C --> D["STAR 2.7.11b<br/>Genome alignment"]
+
+    D --> E["Sorted BAM"]
+    D --> F["Transcriptome BAM"]
+    D --> G["Chimeric output"]
+    D --> H["GeneCounts"]
+
+    E --> I["Arriba 2.5.0<br/>Fusion detection"]
+    G --> I
+    I --> I1["fusions.tsv"]
+
+    E --> J["Subread featureCounts 2.1.1<br/>Gene count matrix"]
+    J --> J1["gene_counts.txt"]
+
+    F --> K["RSEM 1.2.28<br/>Gene/transcript expression"]
+    K --> K1["*.genes.results"]
+    K --> K2["*.isoforms.results"]
+
+    C --> L["fastp HTML / JSON"]
+    D --> M["STAR logs"]
+
+    I1 --> N["Result bundle"]
+    J1 --> N
+    K1 --> N
+    K2 --> N
+    L --> N
+    M --> N
+    N --> O["Download and extract locally"]
+```
 
 ## Assumptions
 
