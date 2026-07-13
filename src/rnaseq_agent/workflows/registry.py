@@ -3,11 +3,15 @@ from __future__ import annotations
 from typing import Any
 
 from .base import Workflow
+from .epigenome import ATACSeqWorkflow, ChIPSeqWorkflow, CUTTagWorkflow
 from .rnaseq import RNASeqWorkflow
 
 
 _WORKFLOWS: dict[str, Workflow] = {
     RNASeqWorkflow.name: RNASeqWorkflow(),
+    ATACSeqWorkflow.name: ATACSeqWorkflow(),
+    ChIPSeqWorkflow.name: ChIPSeqWorkflow(),
+    CUTTagWorkflow.name: CUTTagWorkflow(),
 }
 
 

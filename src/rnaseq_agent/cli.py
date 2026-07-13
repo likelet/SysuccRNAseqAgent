@@ -18,7 +18,7 @@ from .wizard import run_wizard
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="sysucc-omic-agent",
-        description="Interactive RNA-seq analysis agent.",
+        description="Interactive omics analysis agent.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

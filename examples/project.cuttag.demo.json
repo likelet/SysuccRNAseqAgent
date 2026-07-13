@@ -1,0 +1,70 @@
+{
+  "workflow": {
+    "type": "cuttag",
+    "label": "CUT&Tag"
+  },
+  "project": {
+    "id": "cuttag_demo_001",
+    "name": "CUT&Tag demo",
+    "description": "Demo CUT&Tag project configuration."
+  },
+  "server": {
+    "host": "hpc.example.edu",
+    "user": "username",
+    "scheduler": "slurm",
+    "remote_base_dir": "/data/users/username/omic_projects",
+    "remote_workdir": "/data/users/username/omic_projects/cuttag_demo_001",
+    "threads": 16,
+    "memory_gb": 64,
+    "shell": "bash",
+    "init_commands": [
+      "source ~/miniconda3/etc/profile.d/conda.sh",
+      "conda activate epigenome"
+    ]
+  },
+  "sequencing": {
+    "layout": "paired",
+    "reads_per_sample_million": 20
+  },
+  "samples": {
+    "local_data_dir": "D:/data/cuttag/raw_fastq",
+    "remote_data_dir": "/data/users/username/omic_projects/cuttag_demo_001/raw",
+    "items": [
+      {
+        "sample_id": "H3K27me3_Tumor_1",
+        "group": "H3K27me3_Tumor",
+        "fastq_1": "H3K27me3_Tumor_1_R1.fastq.gz",
+        "fastq_2": "H3K27me3_Tumor_1_R2.fastq.gz",
+        "replicate": 1,
+        "control": "IgG_Tumor"
+      },
+      {
+        "sample_id": "IgG_Tumor_1",
+        "group": "IgG_Tumor",
+        "fastq_1": "IgG_Tumor_1_R1.fastq.gz",
+        "fastq_2": "IgG_Tumor_1_R2.fastq.gz",
+        "replicate": 1
+      }
+    ]
+  },
+  "execution": {
+    "backend": "bash",
+    "nfcore": {
+      "pipeline": "nf-core/cutandrun",
+      "revision": "3.2.2",
+      "profile": "singularity",
+      "params": {},
+      "extra_args": ""
+    }
+  },
+  "reference": {
+    "genome_size": "hs",
+    "bowtie2_index_prefix": "/data/ref/genomes/GRCh38/bowtie2/GRCh38",
+    "chromosome_sizes_path": "/data/ref/genomes/GRCh38/GRCh38.chrom.sizes",
+    "blacklist_bed_path": "/data/ref/genomes/GRCh38/ENCFF356LFX.bed",
+    "nfcore_genome": "GRCh38"
+  },
+  "notification": {
+    "email_enabled": false
+  }
+}

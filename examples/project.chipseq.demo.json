@@ -1,0 +1,79 @@
+{
+  "workflow": {
+    "type": "chipseq",
+    "label": "ChIP-seq"
+  },
+  "project": {
+    "id": "chipseq_demo_001",
+    "name": "ChIP-seq demo",
+    "description": "Demo ChIP-seq project configuration."
+  },
+  "server": {
+    "host": "hpc.example.edu",
+    "user": "username",
+    "scheduler": "slurm",
+    "remote_base_dir": "/data/users/username/omic_projects",
+    "remote_workdir": "/data/users/username/omic_projects/chipseq_demo_001",
+    "threads": 16,
+    "memory_gb": 64,
+    "shell": "bash",
+    "init_commands": [
+      "source ~/miniconda3/etc/profile.d/conda.sh",
+      "conda activate epigenome"
+    ]
+  },
+  "sequencing": {
+    "layout": "paired",
+    "reads_per_sample_million": 40
+  },
+  "samples": {
+    "local_data_dir": "D:/data/chipseq/raw_fastq",
+    "remote_data_dir": "/data/users/username/omic_projects/chipseq_demo_001/raw",
+    "items": [
+      {
+        "sample_id": "H3K27ac_Tumor_1",
+        "fastq_1": "H3K27ac_Tumor_1_R1.fastq.gz",
+        "fastq_2": "H3K27ac_Tumor_1_R2.fastq.gz",
+        "replicate": 1,
+        "antibody": "H3K27ac",
+        "control": "Input_Tumor_1",
+        "control_replicate": 1
+      },
+      {
+        "sample_id": "Input_Tumor_1",
+        "fastq_1": "Input_Tumor_1_R1.fastq.gz",
+        "fastq_2": "Input_Tumor_1_R2.fastq.gz",
+        "replicate": 1
+      }
+    ]
+  },
+  "pipeline": {
+    "peak_calling": {
+      "enabled": true,
+      "version": "MACS2 2.2.x",
+      "tool": "macs2",
+      "peak_type": "narrow",
+      "extra_args": ""
+    }
+  },
+  "execution": {
+    "backend": "bash",
+    "nfcore": {
+      "pipeline": "nf-core/chipseq",
+      "revision": "2.1.0",
+      "profile": "singularity",
+      "params": {},
+      "extra_args": ""
+    }
+  },
+  "reference": {
+    "genome_size": "hs",
+    "bowtie2_index_prefix": "/data/ref/genomes/GRCh38/bowtie2/GRCh38",
+    "chromosome_sizes_path": "/data/ref/genomes/GRCh38/GRCh38.chrom.sizes",
+    "blacklist_bed_path": "/data/ref/genomes/GRCh38/ENCFF356LFX.bed",
+    "nfcore_genome": "GRCh38"
+  },
+  "notification": {
+    "email_enabled": false
+  }
+}

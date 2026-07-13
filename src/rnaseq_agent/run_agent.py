@@ -77,7 +77,7 @@ def run_project(config_path: Path, *, wait: bool = True) -> RunOutcome:
 
         final_state = _poll_until_finished(config_path, logs_dir)
         if final_state == "completed":
-            _update_status(config_path, "remote_completed", "Remote RNA-seq analysis completed.")
+            _update_status(config_path, "remote_completed", "Remote omics analysis completed.")
             try:
                 _download_results(normalize_config(load_json(config_path)), downloads_dir, logs_dir)
             except Exception as download_exc:
@@ -85,12 +85,12 @@ def run_project(config_path: Path, *, wait: bool = True) -> RunOutcome:
                 _update_status(config_path, "download_failed", message)
                 _notify(normalize_config(load_json(config_path)), "download_failed", message)
                 return RunOutcome("download_failed", message, project_dir)
-            message = "RNA-seq analysis completed and results downloaded."
+            message = "Omics analysis completed and results downloaded."
             final_state = "completed"
         elif final_state == "timeout":
-            message = "RNA-seq analysis did not finish before the polling timeout."
+            message = "Omics analysis did not finish before the polling timeout."
         else:
-            message = "RNA-seq analysis failed on the server."
+            message = "Omics analysis failed on the server."
 
         _update_status(config_path, final_state, message)
         _notify(normalize_config(load_json(config_path)), final_state, message)

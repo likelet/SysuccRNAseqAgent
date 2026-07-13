@@ -17,6 +17,12 @@ STEP_WEIGHTS = {
     "arriba": 0.25,
     "featurecounts": 0.15,
     "rsem": 0.45,
+    "alignment": 0.55,
+    "mark_duplicates": 0.20,
+    "blacklist_filter": 0.10,
+    "bigwig": 0.20,
+    "peak_calling": 0.15,
+    "seacr": 0.10,
 }
 
 

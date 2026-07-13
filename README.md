@@ -1,6 +1,6 @@
 # SysuccOmicAgent
 
-SysuccOmicAgent is an interactive omics analysis agent. The current version focuses on RNA-seq: it can validate local FASTQ files, upload them to a remote server, generate remote pipeline scripts for `fastp`, `STAR`, `Arriba`, `featureCounts`, and `RSEM`, submit the job through `slurm`, `pbs`, or a remote background shell, poll job state, download result bundles, and send email notifications.
+SysuccOmicAgent is an interactive omics analysis agent. It can validate local FASTQ files, upload them to a remote server, generate remote pipeline scripts, submit the job through `slurm`, `pbs`, or a remote background shell, poll job state, download result bundles, and send email notifications. The current registered workflows cover RNA-seq, ATAC-seq, ChIP-seq, and CUT&Tag.
 
 Author: Qi Zhao <zhaoqi@sysucc.org.cn>
 
@@ -8,7 +8,7 @@ Author: Qi Zhao <zhaoqi@sysucc.org.cn>
 
 - Interactive wizard with step-by-step progress.
 - One-time default reference setup for GENCODE human release 47.
-- Per-project local FASTQ, server, polling, notification, and pipeline configuration.
+- Per-project local FASTQ, server, polling, notification, workflow backend, reference, and pipeline configuration.
 - Runtime estimate based on sample count, read depth, selected steps, and thread count.
 - Local FASTQ validation before upload.
 - Upload command generation for transferring local FASTQ files to the server.
@@ -16,6 +16,7 @@ Author: Qi Zhao <zhaoqi@sysucc.org.cn>
 - `status` command for refreshing current remote state.
 - Email notification settings stored in the project config.
 - JSON configuration only for now, so the tool runs with the Python standard library.
+- Optional nf-core backend hooks for ATAC-seq, ChIP-seq, and CUT&Tag projects when Nextflow is available on the server.
 
 ## Analysis Workflow
 
@@ -66,6 +67,8 @@ Full Chinese usage guide: [docs/usage.md](docs/usage.md)
 
 Project flow diagrams: [docs/flow.md](docs/flow.md)
 
+Workflow backend details: [docs/workflows.md](docs/workflows.md)
+
 From this repository without installation:
 
 ```powershell
@@ -105,9 +108,12 @@ This project has a GUI, but its core is still an agent-style workflow:
 
 ## Extensible Workflow Structure
 
-SysuccOmicAgent now uses a workflow registry. The current registered workflow is:
+SysuccOmicAgent uses a workflow registry. The current registered workflows are:
 
 - `rnaseq` - Bulk RNA-seq analysis
+- `atacseq` - ATAC-seq alignment, QC, bigWig, and peak calling
+- `chipseq` - ChIP-seq alignment, QC, bigWig, and peak calling
+- `cuttag` - CUT&Tag alignment, QC, bigWig, and peak calling
 
 Project configs include:
 
@@ -131,6 +137,35 @@ Each workflow owns its analysis-specific behavior:
 - `render_env_setup_script(config)`, `render_pipeline_script(config)`, and `render_submit_script(config)` generate remote scripts.
 - `result_dirs` lists remote result folders that should be bundled and downloaded.
 
+ATAC-seq, ChIP-seq, and CUT&Tag support two execution backends:
+
+```json
+{
+  "execution": {
+    "backend": "bash"
+  }
+}
+```
+
+`bash` renders a lightweight server script using common command-line tools such as `fastp`, `bowtie2` or `bwa`, `samtools`, `picard`, `bedtools`, `deepTools`, and `macs2`. Use this when those tools are already managed by the server environment.
+
+```json
+{
+  "execution": {
+    "backend": "nfcore",
+    "nfcore": {
+      "pipeline": "nf-core/atacseq",
+      "revision": "2.1.2",
+      "profile": "singularity",
+      "params": {},
+      "extra_args": ""
+    }
+  }
+}
+```
+
+`nfcore` renders a Nextflow command and samplesheet for the matching nf-core pipeline. The built-in defaults are `nf-core/atacseq`, `nf-core/chipseq`, and `nf-core/cutandrun` for CUT&Tag/CUT&RUN-style projects. Override `revision`, `profile`, and `params` to match the server environment.
+
 If you want to inspect the individual steps first:
 
 ```powershell
@@ -140,6 +175,13 @@ python -m rnaseq_agent upload-command runs/<project_id>/project.json
 python -m rnaseq_agent estimate runs/<project_id>/project.json
 python -m rnaseq_agent status runs/<project_id>/project.json
 ```
+
+Example configs:
+
+- [examples/project.demo.json](examples/project.demo.json) - RNA-seq
+- [examples/project.atacseq.demo.json](examples/project.atacseq.demo.json) - ATAC-seq
+- [examples/project.chipseq.demo.json](examples/project.chipseq.demo.json) - ChIP-seq
+- [examples/project.cuttag.demo.json](examples/project.cuttag.demo.json) - CUT&Tag
 
 The wizard writes:
 
