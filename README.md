@@ -120,7 +120,16 @@ Project configs include:
 }
 ```
 
-To add another omics workflow later, add a module under `src/rnaseq_agent/workflows/` that implements the workflow interface, then register it in `workflows/registry.py`. The GUI, chat mode, CLI runner, upload, polling, and download logic can be reused.
+To add another omics workflow later, add a module under `src/rnaseq_agent/workflows/` that implements the workflow interface, then register it with `register_workflow()` in `workflows/registry.py`. The GUI, chat mode, CLI runner, upload, polling, and download logic can be reused.
+
+Each workflow owns its analysis-specific behavior:
+
+- `default_reference()` returns reference defaults for that workflow.
+- `default_pipeline()` returns step defaults and versions.
+- `normalize_config(config)` merges workflow defaults into a project config.
+- `validate_config(config)` checks workflow-specific dependencies and required reference files.
+- `render_env_setup_script(config)`, `render_pipeline_script(config)`, and `render_submit_script(config)` generate remote scripts.
+- `result_dirs` lists remote result folders that should be bundled and downloaded.
 
 If you want to inspect the individual steps first:
 

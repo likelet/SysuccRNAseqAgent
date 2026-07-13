@@ -11,6 +11,12 @@ _WORKFLOWS: dict[str, Workflow] = {
 }
 
 
+def register_workflow(workflow: Workflow) -> None:
+    if workflow.name in _WORKFLOWS:
+        raise ValueError(f"Workflow already registered: {workflow.name}")
+    _WORKFLOWS[workflow.name] = workflow
+
+
 def list_workflows() -> list[Workflow]:
     return list(_WORKFLOWS.values())
 

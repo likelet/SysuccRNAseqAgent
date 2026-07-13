@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .workflows import get_workflow
+
 
 @dataclass(frozen=True)
 class ValidationResult:
@@ -32,7 +34,7 @@ def validate_local_fastqs(config: dict[str, Any]) -> ValidationResult:
             if not path.exists():
                 missing.append(path)
 
-    errors.extend(_pipeline_errors(config))
+    errors.extend(get_workflow(config).validate_config(config))
     return ValidationResult(ok=not missing and not errors, checked_files=checked, missing_files=missing, errors=errors)
 
 
@@ -68,33 +70,5 @@ def _sample_errors(config: dict[str, Any]) -> list[str]:
     server = config.get("server", {})
     if not server.get("remote_workdir"):
         errors.append("Missing server.remote_workdir.")
-
-    return errors
-
-
-def _pipeline_errors(config: dict[str, Any]) -> list[str]:
-    pipeline = config.get("pipeline", {})
-    errors: list[str] = []
-    star_enabled = pipeline.get("star", {}).get("enabled", True)
-
-    dependent_steps = ("arriba", "featurecounts", "rsem")
-    for step in dependent_steps:
-        if pipeline.get(step, {}).get("enabled", False) and not star_enabled:
-            errors.append(f"{step} requires star to be enabled.")
-
-    reference = config.get("reference", {})
-    required_reference_keys = []
-    if pipeline.get("star", {}).get("enabled", True):
-        required_reference_keys.append("star_index_dir")
-    if pipeline.get("featurecounts", {}).get("enabled", False) or pipeline.get("arriba", {}).get("enabled", False):
-        required_reference_keys.append("remote_gtf_path")
-    if pipeline.get("arriba", {}).get("enabled", False):
-        required_reference_keys.append("remote_genome_fasta_path")
-    if pipeline.get("rsem", {}).get("enabled", False):
-        required_reference_keys.append("rsem_index_prefix")
-
-    for key in required_reference_keys:
-        if not reference.get(key):
-            errors.append(f"Missing required reference setting: {key}")
 
     return errors
