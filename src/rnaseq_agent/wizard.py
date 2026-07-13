@@ -34,6 +34,7 @@ def run_wizard(output_dir: Path) -> Path:
 
     config = {
         "schema_version": 1,
+        "workflow": {"type": "rnaseq", "label": "Bulk RNA-seq"},
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "project": project,
         "server": {**server, "remote_workdir": remote_workdir},

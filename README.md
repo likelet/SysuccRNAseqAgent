@@ -103,6 +103,25 @@ This project has a GUI, but its core is still an agent-style workflow:
 - The analysis workflow can be extended to other pipelines without redesigning the interface.
 - It orchestrates local data, remote execution, polling, download, and notification instead of only running local actions.
 
+## Extensible Workflow Structure
+
+SysuccOmicAgent now uses a workflow registry. The current registered workflow is:
+
+- `rnaseq` - Bulk RNA-seq analysis
+
+Project configs include:
+
+```json
+{
+  "workflow": {
+    "type": "rnaseq",
+    "label": "Bulk RNA-seq"
+  }
+}
+```
+
+To add another omics workflow later, add a module under `src/rnaseq_agent/workflows/` that implements the workflow interface, then register it in `workflows/registry.py`. The GUI, chat mode, CLI runner, upload, polling, and download logic can be reused.
+
 If you want to inspect the individual steps first:
 
 ```powershell

@@ -211,6 +211,7 @@ class ConfigApp(Tk):
 
         config = {
             "schema_version": 1,
+            "workflow": {"type": "rnaseq", "label": "Bulk RNA-seq"},
             "created_at": datetime.now().isoformat(timespec="seconds"),
             "project": {
                 "id": project_id,

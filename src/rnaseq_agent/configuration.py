@@ -8,6 +8,7 @@ from .defaults import DEFAULT_PIPELINE, DEFAULT_REFERENCE
 
 def normalize_config(config: dict[str, Any]) -> dict[str, Any]:
     normalized = deepcopy(config)
+    normalized.setdefault("workflow", {"type": "rnaseq", "label": "Bulk RNA-seq"})
 
     reference = {**DEFAULT_REFERENCE, **normalized.get("reference", {})}
     normalized["reference"] = reference

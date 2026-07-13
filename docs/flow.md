@@ -5,8 +5,9 @@
 ```mermaid
 flowchart TD
     A["用户启动 gui / chat / wizard"] --> B["图形界面或对话式填写项目信息"]
-    B --> C["加载/确认固定参考配置"]
-    C --> D["生成项目配置 project.json"]
+    B --> C["选择 workflow<br/>当前：rnaseq"]
+    C --> C1["加载/确认固定参考配置"]
+    C1 --> D["生成项目配置 project.json"]
 
     D --> E["validate-local<br/>校验本地 FASTQ 和配置"]
     E -->|通过| F["run<br/>启动自动分析"]

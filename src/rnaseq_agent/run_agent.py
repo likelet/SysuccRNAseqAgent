@@ -9,11 +9,11 @@ from typing import Any
 from .configuration import normalize_config
 from .emailer import send_completion_email
 from .execution import CommandResult, run_command
-from .pipeline import render_env_setup_script, render_remote_pipeline_script, render_submit_script
 from .remote import build_upload_commands
 from .shell import shell_quote
 from .storage import append_jsonl, load_json, save_json
 from .validation import validate_local_fastqs
+from .workflows import get_workflow
 
 
 @dataclass(frozen=True)
@@ -126,10 +126,11 @@ def _prepare_remote_scripts(config: dict[str, Any], project_dir: Path, logs_dir:
     scripts_dir.mkdir(parents=True, exist_ok=True)
 
     env_setup_script = scripts_dir / "env_setup.sh"
-    env_setup_script.write_text(render_env_setup_script(config), encoding="utf-8", newline="\n")
+    workflow = get_workflow(config)
+    env_setup_script.write_text(workflow.render_env_setup_script(config), encoding="utf-8", newline="\n")
 
     run_script = scripts_dir / "run_pipeline.sh"
-    run_script.write_text(render_remote_pipeline_script(config), encoding="utf-8", newline="\n")
+    run_script.write_text(workflow.render_pipeline_script(config), encoding="utf-8", newline="\n")
 
     submit_name = "submit.sh"
     scheduler = config["server"]["scheduler"]
@@ -138,7 +139,7 @@ def _prepare_remote_scripts(config: dict[str, Any], project_dir: Path, logs_dir:
     elif scheduler == "pbs":
         submit_name = "submit.pbs"
     submit_script = scripts_dir / submit_name
-    submit_script.write_text(render_submit_script(config), encoding="utf-8", newline="\n")
+    submit_script.write_text(workflow.render_submit_script(config), encoding="utf-8", newline="\n")
 
     rendered_paths = [env_setup_script, run_script, submit_script]
     _log_event(logs_dir, "scripts_rendered", {"paths": [str(path) for path in rendered_paths]})
@@ -236,10 +237,12 @@ def _download_results(config: dict[str, Any], downloads_dir: Path, logs_dir: Pat
     remote_workdir = server["remote_workdir"]
     downloads_dir.mkdir(parents=True, exist_ok=True)
     remote_tar = f"{remote_workdir.rstrip('/')}/downloads_bundle.tar.gz"
+    workflow = get_workflow(config)
+    dirs = " ".join(workflow.result_dirs)
     pack_cmd = (
         f"cd {shell_quote(remote_workdir)} && "
         "paths=(); "
-        "for d in logs fastp star arriba featurecounts rsem status; do "
+        f"for d in {dirs}; do "
         'if [ -e "$d" ]; then paths+=("$d"); fi; '
         "done; "
         f"tar -czf {shell_quote(remote_tar)} \"${{paths[@]}}\""
