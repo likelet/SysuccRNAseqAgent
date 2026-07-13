@@ -17,6 +17,7 @@ Author: Qi Zhao <zhaoqi@sysucc.org.cn>
 - Email notification settings stored in the project config.
 - JSON configuration only for now, so the tool runs with the Python standard library.
 - Optional nf-core backend hooks for ATAC-seq, ChIP-seq, and CUT&Tag projects when Nextflow is available on the server.
+- RNA-seq reference auto-setup: by default, GENCODE v47 FASTA/GTF can be downloaded on the server and STAR/RSEM references can be built automatically when missing.
 
 ## Analysis Workflow
 
@@ -166,6 +167,23 @@ ATAC-seq, ChIP-seq, and CUT&Tag support two execution backends:
 
 `nfcore` renders a Nextflow command and samplesheet for the matching nf-core pipeline. The built-in defaults are `nf-core/atacseq`, `nf-core/chipseq`, and `nf-core/cutandrun` for CUT&Tag/CUT&RUN-style projects. Override `revision`, `profile`, and `params` to match the server environment.
 
+RNA-seq also supports `execution.backend = "nfcore"` with `nf-core/rnaseq`. When `reference.nfcore_genome` is empty, the generated command passes the configured `reference.remote_genome_fasta_path` and `reference.remote_gtf_path` as `--fasta` and `--gtf`.
+
+For the default bash RNA-seq backend, `reference.auto_setup` controls server-side reference preparation:
+
+```json
+{
+  "reference": {
+    "auto_setup": true,
+    "gtf_url": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.chr_patch_hapl_scaff.annotation.gtf.gz",
+    "genome_fasta_url": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.p14.genome.fa.gz",
+    "remote_ref_dir": "/data/ref/gencode/human/release_47_all"
+  }
+}
+```
+
+If `auto_setup` is true, the generated server script checks for the FASTA, GTF, STAR index, and RSEM reference before analysis. Missing files are downloaded or built under the configured reference directory.
+
 If you want to inspect the individual steps first:
 
 ```powershell
@@ -179,6 +197,7 @@ python -m rnaseq_agent status runs/<project_id>/project.json
 Example configs:
 
 - [examples/project.demo.json](examples/project.demo.json) - RNA-seq
+- [examples/project.rnaseq.nfcore.demo.json](examples/project.rnaseq.nfcore.demo.json) - RNA-seq with nf-core/rnaseq
 - [examples/project.atacseq.demo.json](examples/project.atacseq.demo.json) - ATAC-seq
 - [examples/project.chipseq.demo.json](examples/project.chipseq.demo.json) - ChIP-seq
 - [examples/project.cuttag.demo.json](examples/project.cuttag.demo.json) - CUT&Tag

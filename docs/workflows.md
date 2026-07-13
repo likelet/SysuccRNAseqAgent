@@ -6,7 +6,7 @@ SysuccOmicAgent supports multiple workflow types through `workflow.type`.
 
 | `workflow.type` | Label | Default backend | Optional nf-core pipeline |
 | --- | --- | --- | --- |
-| `rnaseq` | Bulk RNA-seq | `bash` | Not wired in this version |
+| `rnaseq` | Bulk RNA-seq | `bash` | `nf-core/rnaseq` |
 | `atacseq` | ATAC-seq | `bash` | `nf-core/atacseq` |
 | `chipseq` | ChIP-seq | `bash` | `nf-core/chipseq` |
 | `cuttag` | CUT&Tag | `bash` | `nf-core/cutandrun` |
@@ -48,9 +48,26 @@ Use `execution.nfcore.params` for pipeline parameters such as custom genome sett
 
 The server must provide `nextflow`, Java, and the selected container/runtime profile such as Singularity, Apptainer, Docker, or Conda.
 
+## RNA-seq Reference Auto-Setup
+
+The RNA-seq bash backend can prepare the default GENCODE reference on the server when files are missing. The default reference is GENCODE Human Release 47, GRCh38.p14, ALL regions.
+
+Controlled fields:
+
+- `reference.auto_setup`: enable or disable server-side preparation.
+- `reference.gtf_url`: compressed GTF download URL.
+- `reference.genome_fasta_url`: compressed genome FASTA download URL.
+- `reference.remote_gtf_path`: decompressed GTF target path on the server.
+- `reference.remote_genome_fasta_path`: decompressed FASTA target path on the server.
+- `reference.star_index_dir`: STAR genome index target directory.
+- `reference.rsem_index_prefix`: RSEM reference prefix.
+
+When `auto_setup` is true, `run_pipeline.sh` checks the configured paths. Missing FASTA/GTF files are downloaded with `curl` or `wget`, STAR index is generated with `STAR --runMode genomeGenerate`, and RSEM reference is generated with `rsem-prepare-reference` when RSEM is enabled.
+
 ## Example Configs
 
 - `examples/project.demo.json`
+- `examples/project.rnaseq.nfcore.demo.json`
 - `examples/project.atacseq.demo.json`
 - `examples/project.chipseq.demo.json`
 - `examples/project.cuttag.demo.json`

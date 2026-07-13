@@ -1,0 +1,69 @@
+{
+  "workflow": {
+    "type": "rnaseq",
+    "label": "Bulk RNA-seq"
+  },
+  "project": {
+    "id": "rnaseq_nfcore_demo_001",
+    "name": "RNA-seq nf-core demo",
+    "description": "Demo RNA-seq project using nf-core/rnaseq backend."
+  },
+  "server": {
+    "host": "hpc.example.edu",
+    "user": "username",
+    "scheduler": "slurm",
+    "remote_base_dir": "/data/users/username/rnaseq_projects",
+    "remote_workdir": "/data/users/username/rnaseq_projects/rnaseq_nfcore_demo_001",
+    "threads": 16,
+    "memory_gb": 64,
+    "shell": "bash",
+    "init_commands": [
+      "source ~/miniconda3/etc/profile.d/conda.sh",
+      "conda activate nextflow"
+    ]
+  },
+  "sequencing": {
+    "layout": "paired",
+    "strandedness": "auto",
+    "seq_platform": "ILLUMINA",
+    "reads_per_sample_million": 40
+  },
+  "samples": {
+    "local_data_dir": "D:/data/rnaseq/raw_fastq",
+    "remote_data_dir": "/data/users/username/rnaseq_projects/rnaseq_nfcore_demo_001/raw",
+    "items": [
+      {
+        "sample_id": "Tumor_1",
+        "fastq_1": "Tumor_1_R1.fastq.gz",
+        "fastq_2": "Tumor_1_R2.fastq.gz"
+      },
+      {
+        "sample_id": "Normal_1",
+        "fastq_1": "Normal_1_R1.fastq.gz",
+        "fastq_2": "Normal_1_R2.fastq.gz"
+      }
+    ]
+  },
+  "execution": {
+    "backend": "nfcore",
+    "nfcore": {
+      "pipeline": "nf-core/rnaseq",
+      "revision": "3.26.0",
+      "profile": "singularity",
+      "params": {},
+      "extra_args": ""
+    }
+  },
+  "reference": {
+    "auto_setup": true,
+    "nfcore_genome": "",
+    "gtf_url": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.chr_patch_hapl_scaff.annotation.gtf.gz",
+    "genome_fasta_url": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.p14.genome.fa.gz",
+    "remote_ref_dir": "/data/ref/gencode/human/release_47_all",
+    "remote_gtf_path": "/data/ref/gencode/human/release_47_all/gencode.v47.chr_patch_hapl_scaff.annotation.gtf",
+    "remote_genome_fasta_path": "/data/ref/gencode/human/release_47_all/GRCh38.p14.genome.fa"
+  },
+  "notification": {
+    "email_enabled": false
+  }
+}

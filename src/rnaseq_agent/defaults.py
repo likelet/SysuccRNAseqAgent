@@ -15,6 +15,8 @@ DEFAULT_REFERENCE = {
     "rsem_index_prefix": "/data/ref/gencode/human/release_47_all/rsem/rsem_gencode_v47",
     "arriba_blacklist_path": "",
     "arriba_known_fusions_path": "",
+    "auto_setup": True,
+    "nfcore_genome": "",
 }
 
 DEFAULT_PIPELINE = {

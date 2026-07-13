@@ -27,6 +27,7 @@ def render_remote_pipeline_script(config: dict[str, Any]) -> str:
     threads = int(server["threads"])
     paired = sequencing["layout"] == "paired"
     featurecounts_strand = _featurecounts_strand(sequencing.get("strandedness", "auto"))
+    reference_setup_block = _render_reference_setup_block(config)
 
     sample_blocks = []
     bam_exprs = []
@@ -186,7 +187,9 @@ trap cleanup_failure ERR
 echo "running" > status/state.txt
 date -Is > status/started_at.txt
 
-{prefix}{sample_section}
+{prefix}{reference_setup_block}
+
+{sample_section}
 
 {featurecounts_block}
 
@@ -238,3 +241,70 @@ def _featurecounts_strand(strandedness: str) -> int:
         "reverse": 2,
     }
     return mapping.get(strandedness, 0)
+
+
+def _render_reference_setup_block(config: dict[str, Any]) -> str:
+    reference = config["reference"]
+    pipeline = config["pipeline"]
+    if not reference.get("auto_setup", True):
+        return ""
+
+    blocks = [
+        f"""
+mkdir -p {shell_quote(reference["remote_ref_dir"])}
+if [ ! -s {shell_quote(reference["remote_gtf_path"])} ]; then
+  echo "Downloading GTF reference to {reference["remote_gtf_path"]}"
+  tmp_gtf={shell_quote(reference["remote_gtf_path"] + ".gz")}
+  if command -v curl >/dev/null 2>&1; then
+    curl -L {shell_quote(reference["gtf_url"])} -o "$tmp_gtf"
+  else
+    wget -O "$tmp_gtf" {shell_quote(reference["gtf_url"])}
+  fi
+  gzip -dc "$tmp_gtf" > {shell_quote(reference["remote_gtf_path"])}
+fi
+if [ ! -s {shell_quote(reference["remote_genome_fasta_path"])} ]; then
+  echo "Downloading genome FASTA reference to {reference["remote_genome_fasta_path"]}"
+  tmp_fasta={shell_quote(reference["remote_genome_fasta_path"] + ".gz")}
+  if command -v curl >/dev/null 2>&1; then
+    curl -L {shell_quote(reference["genome_fasta_url"])} -o "$tmp_fasta"
+  else
+    wget -O "$tmp_fasta" {shell_quote(reference["genome_fasta_url"])}
+  fi
+  gzip -dc "$tmp_fasta" > {shell_quote(reference["remote_genome_fasta_path"])}
+fi
+""".strip()
+    ]
+
+    if pipeline.get("star", {}).get("enabled", True):
+        blocks.append(
+            f"""
+if [ ! -s {shell_quote(reference["star_index_dir"] + "/Genome")} ]; then
+  echo "Building STAR index in {reference["star_index_dir"]}"
+  mkdir -p {shell_quote(reference["star_index_dir"])}
+  STAR \\
+    --runThreadN {int(config["server"]["threads"])} \\
+    --runMode genomeGenerate \\
+    --genomeDir {shell_quote(reference["star_index_dir"])} \\
+    --genomeFastaFiles {shell_quote(reference["remote_genome_fasta_path"])} \\
+    --sjdbGTFfile {shell_quote(reference["remote_gtf_path"])} \\
+    --sjdbOverhang {int(config.get("sequencing", {}).get("read_length", 150)) - 1}
+fi
+""".strip()
+        )
+
+    if pipeline.get("rsem", {}).get("enabled", False):
+        blocks.append(
+            f"""
+if [ ! -s {shell_quote(reference["rsem_index_prefix"] + ".grp")} ]; then
+  echo "Building RSEM reference at {reference["rsem_index_prefix"]}"
+  mkdir -p "$(dirname {shell_quote(reference["rsem_index_prefix"])})"
+  rsem-prepare-reference \\
+    --gtf {shell_quote(reference["remote_gtf_path"])} \\
+    -p {int(config["server"]["threads"])} \\
+    {shell_quote(reference["remote_genome_fasta_path"])} \\
+    {shell_quote(reference["rsem_index_prefix"])}
+fi
+""".strip()
+        )
+
+    return "\n\n".join(blocks)
