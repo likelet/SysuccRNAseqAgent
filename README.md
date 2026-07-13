@@ -1,6 +1,6 @@
-# SYSU RNA-seq Agent
+# SysuccOmicAgent
 
-This project starts an interactive RNA-seq analysis agent from scratch. The current version can validate local FASTQ files, upload them to a remote server, generate remote pipeline scripts for `fastp`, `STAR`, `Arriba`, `featureCounts`, and `RSEM`, submit the job through `slurm`, `pbs`, or a remote background shell, poll job state, download result bundles, and send email notifications.
+SysuccOmicAgent is an interactive omics analysis agent. The current version focuses on RNA-seq: it can validate local FASTQ files, upload them to a remote server, generate remote pipeline scripts for `fastp`, `STAR`, `Arriba`, `featureCounts`, and `RSEM`, submit the job through `slurm`, `pbs`, or a remote background shell, poll job state, download result bundles, and send email notifications.
 
 Author: Qi Zhao <zhaoqi@sysucc.org.cn>
 
@@ -77,7 +77,7 @@ Or install it in editable mode:
 
 ```powershell
 python -m pip install -e .
-rnaseq-agent gui
+sysucc-omic-agent gui
 ```
 
 Recommended flow:

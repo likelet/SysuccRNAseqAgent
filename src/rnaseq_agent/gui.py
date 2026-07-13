@@ -20,7 +20,7 @@ class ConfigApp(Tk):
     def __init__(self, output_dir: Path) -> None:
         super().__init__()
         self.output_dir = output_dir
-        self.title("SYSU RNA-seq Agent")
+        self.title("SysuccOmicAgent")
         self.geometry("1040x740")
         self.minsize(920, 640)
         self.running = False

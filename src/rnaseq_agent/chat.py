@@ -17,7 +17,7 @@ class ChatSession:
         self.output_dir = output_dir
 
     def run(self) -> Path:
-        self.say("你好，我是 SYSU RNA-seq Agent。")
+        self.say("你好，我是 SysuccOmicAgent。")
         self.say("我会像问诊一样一步步收集配置，最后生成 project.json。")
         self.say("提示：直接回车使用默认值；输入 ? 查看当前问题说明；输入 quit 退出。")
         self.say("")

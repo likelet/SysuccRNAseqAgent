@@ -14,7 +14,7 @@ TOTAL_STEPS = 8
 
 
 def run_wizard(output_dir: Path) -> Path:
-    print("SYSU RNA-seq Agent 交互式向导")
+    print("SysuccOmicAgent 交互式向导")
     print("目标：采集本地数据、上传到服务器、提交分析、轮询状态、下载结果并生成解读。")
     print()
 

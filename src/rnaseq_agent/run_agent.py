@@ -260,7 +260,7 @@ def _notify(config: dict[str, Any], state: str, message: str) -> None:
     notification = config.get("notification", {})
     if not notification.get("email_enabled"):
         return
-    subject = f"[RNA-seq Agent] {config['project']['id']} {state}"
+    subject = f"[SysuccOmicAgent] {config['project']['id']} {state}"
     body = (
         f"Project: {config['project']['id']}\n"
         f"State: {state}\n"

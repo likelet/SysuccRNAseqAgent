@@ -1,4 +1,4 @@
-# SYSU RNA-seq Agent 流程示意图
+# SysuccOmicAgent 流程示意图
 
 ## 端到端流程
 

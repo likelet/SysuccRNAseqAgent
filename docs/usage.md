@@ -1,4 +1,4 @@
-# SYSU RNA-seq Agent 使用文档
+# SysuccOmicAgent 使用文档
 
 本文档说明如何从本地 FASTQ 数据开始，使用 `rnaseq_agent` 上传数据到服务器、提交 RNA-seq 分析、轮询任务状态、下载结果，并在完成或失败时发送邮件提醒。
 
@@ -93,7 +93,7 @@ python -m pip install -e .
 也可以使用：
 
 ```powershell
-rnaseq-agent gui
+sysucc-omic-agent gui
 ```
 
 `gui` 是推荐给普通用户使用的图形界面入口。它会用标签页收集项目、服务器、本地 FASTQ、样本、分析步骤、轮询和邮件提醒配置，最后保存生成 `project.json`。
